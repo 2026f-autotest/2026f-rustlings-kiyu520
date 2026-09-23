@@ -3,7 +3,6 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -49,19 +48,33 @@ where
     }
 
     // Insert a value into the BST
-    fn insert(&mut self, value: T) {
-        //TODO
-        let mut root_node=&mut self.root;
-        let new_node=TreeNode::new(value);
-        loop{
-            if root_node.left==None{
-                root_node.left=Some(&root_node);
-            }
-            if value<=root_node.left.un_wrap(){
-                root_node=&mut root_node.left;
-            }
-            else{
-                root_node=&mut root_node.right;
+    fn insert(&mut self, value: T) 
+    {
+        let mut current = &mut self.root;
+
+        loop {
+            match current {
+                None => {
+                    *current = Some(Box::new(TreeNode::new(value)));
+                    return;
+                }
+                Some(node) => match value.cmp(&node.value) {
+                    Ordering::Less => {
+                        if node.left.is_none() {
+                            node.left = Some(Box::new(TreeNode::new(value)));
+                            return;
+                        }
+                        current = &mut node.left;
+                    }
+                    Ordering::Greater => {
+                        if node.right.is_none() {
+                            node.right = Some(Box::new(TreeNode::new(value)));
+                            return;
+                        }
+                        current = &mut node.right;
+                    }
+                    Ordering::Equal => return,
+                },
             }
         }
     }
@@ -69,7 +82,30 @@ where
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
         //TODO
-        true
+        let mut current = &self.root;
+
+        loop {
+            match current {
+                None => {
+                    return false;
+                }
+                Some(node) => match value.cmp(&node.value) {
+                    Ordering::Less => {
+                        if node.left.is_none() {
+                            return false;
+                        }
+                        current = &node.left;
+                    }
+                    Ordering::Greater => {
+                        if node.right.is_none() {
+                            return false;
+                        }
+                        current = &node.right;
+                    }
+                    Ordering::Equal => return true,
+                },
+            }
+        }
     }
 }
 
